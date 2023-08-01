@@ -13,19 +13,19 @@ def books(request):
         books = list(book for book in books)
         json_response = {
             'response_id': '',
-            'response_message': 'Get Books Success.',
+            'response_message': 'Get Books Succeeded.',
             'data': str(books),
         }
 
-        return Response(json_response, status=status.HTTP_200_OK)
+        return Response(json_response, status = status.HTTP_200_OK)
     
     except Exception as e:
         json_response = {
             'response_id': '',
             'response_message': 'Get Books Failed.',
-            'error': str(e)
+            'error': str(e),
         }
-        return Response(json_response, status=status.HTTP_417_EXPECTATION_FAILED)
+        return Response(json_response, status = status.HTTP_417_EXPECTATION_FAILED)
 
 @api_view(['GET'])
 @renderer_classes([JSONRenderer])
@@ -34,11 +34,11 @@ def get_book(request, id):
         book = Book.objects.get(id = id)
         json_response = {
             'response_id': '',
-            'response_message': 'Get Book Success.',
+            'response_message': 'Get Book Succeeded.',
             'data': str(book),
         }
 
-        return Response(json_response, status=status.HTTP_200_OK)
+        return Response(json_response, status = status.HTTP_200_OK)
     
     except Exception as e:
         json_response = {
@@ -47,7 +47,7 @@ def get_book(request, id):
             'error': str(e),
         }
 
-        return Response(json_response, status=status.HTTP_417_EXPECTATION_FAILED)
+        return Response(json_response, status = status.HTTP_417_EXPECTATION_FAILED)
     
 @api_view(['POST'])
 @renderer_classes([JSONRenderer])
@@ -74,10 +74,10 @@ def add_book(request):
 
         json_response = {
             'response_id': '',
-            'response_message': 'Add Book Success.',
+            'response_message': 'Add Book Succeeded.',
         }
 
-        return Response(json_response, status=status.HTTP_200_OK)
+        return Response(json_response, status = status.HTTP_200_OK)
 
     except Exception as e:
         json_response = {
@@ -90,7 +90,7 @@ def add_book(request):
                 'error': str(e),
             })
 
-            return Response(json_response, status=status.HTTP_400_BAD_REQUEST)
+            return Response(json_response, status = status.HTTP_400_BAD_REQUEST)
         
         else:
             json_response.update({
@@ -98,4 +98,33 @@ def add_book(request):
                 'error': str(e),
             })
         
-            return Response(json_response, status=status.HTTP_417_EXPECTATION_FAILED)
+            return Response(json_response, status = status.HTTP_417_EXPECTATION_FAILED)
+
+@api_view(['PUT'])
+@renderer_classes([JSONRenderer])
+def update_book(request, id):
+    try:
+        book = json.loads(request.body)
+        updated_book = Book.objects.get(id = id)
+        updated_book.title = book['title'] if 'title' in book else updated_book.title
+        updated_book.author = book['author'] if 'author' in book else updated_book.author
+        updated_book.genre = book['genre'] if 'genre' in book else updated_book.genre
+        updated_book.published_year = book['published_year'] if 'published_year' in book else updated_book.published_year        
+        updated_book.is_available = book['is_available'] if 'is_available' in book else updated_book.is_available
+        updated_book.save()
+
+        json_response = {
+            'response_id': '',
+            'response_message': 'Update Book Succeeded.',
+        }
+
+        return Response(json_response, status = status.HTTP_200_OK)
+    
+    except Exception as e:
+        json_response = {
+            'response_id': '',
+            'response_message': 'Update Book Failed.',
+            'error': str(e),
+        }
+
+        return Response(json_response, status = status.HTTP_417_EXPECTATION_FAILED)
