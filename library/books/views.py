@@ -128,3 +128,26 @@ def update_book(request, id):
         }
 
         return Response(json_response, status = status.HTTP_417_EXPECTATION_FAILED)
+
+@api_view(['DELETE'])
+@renderer_classes([JSONRenderer])
+def delete_book(request, id):
+    try:
+        deleted_book = Book.objects.get(id = id)
+        deleted_book.delete()
+
+        json_response = {
+            'response_id': '',
+            'response_message': 'Delete Book Succeeded.',
+        }
+
+        return Response(json_response, status = status.HTTP_200_OK)
+    
+    except Exception as e:
+        json_response = {
+            'response_id': '',
+            'response_message': 'Delete Book Failed',
+            'error': str(e),
+        }
+
+        return Response(json_response, status = status.HTTP_417_EXPECTATION_FAILED)

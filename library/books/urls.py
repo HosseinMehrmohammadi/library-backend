@@ -6,5 +6,6 @@ urlpatterns = [
     path('', views.books, name='books'),
     path('<uuid:id>', views.get_book, name='get_book'),
     path('add', csrf_exempt(views.add_book), name='add_book'),
-    path('<uuid:id>/update', views.update_book, name='update_book')
+    path('<uuid:id>/update', views.update_book, name='update_book'),
+    path('<uuid:id>/delete', views.delete_book, name='delete_book'),
 ]
