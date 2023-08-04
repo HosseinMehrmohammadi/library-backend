@@ -112,13 +112,13 @@ def add_book(request):
 
 @api_view(['PUT'])
 @renderer_classes([JSONRenderer])
-def update_book(request, id):
+def update_book(request):
     json_response = {
         'response_id': str(uuid.uuid4().hex)
     }
     try:
         book = json.loads(request.body)
-        updated_book = Book.objects.get(id = id)
+        updated_book = Book.objects.get(id = book['id'])
         updated_book.title = book['title'] if 'title' in book else updated_book.title
         updated_book.author = book['author'] if 'author' in book else updated_book.author
         updated_book.genre = book['genre'] if 'genre' in book else updated_book.genre
@@ -144,11 +144,12 @@ def update_book(request, id):
 
 @api_view(['DELETE'])
 @renderer_classes([JSONRenderer])
-def delete_book(request, id):
+def delete_book(request):
     json_response = {
         'response_id': str(uuid.uuid4().hex)
     }
     try:
+        id = json.loads(request.body)['id']
         deleted_book = Book.objects.get(id = id)
         deleted_book.delete()
 
