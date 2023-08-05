@@ -9,13 +9,13 @@ from .models import Book
 
 @api_view(['GET'])
 @renderer_classes([JSONRenderer])
-def books(request):
+def get_books(request):
     json_response = {
         'response_id': str(uuid.uuid4().hex)
     }
     try: 
-        books = Book.objects.all().values()
-        books = list(book for book in books)
+        books = Book.objects.all()
+        books = list(book.get_short_details() for book in books)
         json_response.update({
             'response_message': 'Get Books Succeeded.',
             'data': str(books),
@@ -40,7 +40,7 @@ def get_book(request, id):
         'response_id': str(uuid.uuid4().hex)
     }
     try: 
-        book = Book.objects.get(id = id)
+        book = Book.objects.get(id = id).get_full_details()
         json_response.update({
             'response_message': 'Get Book Succeeded.',
             'data': str(book),
@@ -162,7 +162,7 @@ def delete_book(request):
     
     except Exception as e:
         json_response.update({
-            'response_message': 'Delete Book Failed',
+            'response_message': 'Delete Book Failed.',
             'error': str(e),
         })
 
