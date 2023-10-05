@@ -7,8 +7,31 @@ from rest_framework.response import Response
 from .utils import save_log 
 from .models import Book
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 @renderer_classes([JSONRenderer])
+def all_book_service(request):
+    if request.method == 'GET':
+        return get_books(request)
+
+    elif request.method == 'POST':
+        return add_book(request)
+
+### ------------------------------------------------------------- ###
+
+@api_view(['GET', 'PUT', 'DELETE'])
+@renderer_classes([JSONRenderer])
+def book_service(request, id):
+    if request.method == 'GET':
+        return get_book(request, id)
+
+    elif request.method == 'PUT':
+        return update_book(request, id)
+
+    elif request.method == 'DELETE':
+        return delete_book(request, id)
+
+### ------------------------------------------------------------- ###
+
 def get_books(request):
     json_response = {
         'response_id': str(uuid.uuid4().hex)
@@ -18,7 +41,7 @@ def get_books(request):
         books = list(book.get_short_details() for book in books)
         json_response.update({
             'response_message': 'Get Books Succeeded.',
-            'data': str(books),
+            'data': books,
         })
 
         save_log(request, json_response)
@@ -33,8 +56,8 @@ def get_books(request):
         save_log(request, json_response)
         return Response(json_response, status = status.HTTP_417_EXPECTATION_FAILED)
 
-@api_view(['GET'])
-@renderer_classes([JSONRenderer])
+### ------------------------------------------------------------- ###
+
 def get_book(request, id):
     json_response = {
         'response_id': str(uuid.uuid4().hex)
@@ -43,7 +66,7 @@ def get_book(request, id):
         book = Book.objects.get(id = id).get_full_details()
         json_response.update({
             'response_message': 'Get Book Succeeded.',
-            'data': str(book),
+            'data': book,
         })
 
         save_log(request, json_response)
@@ -58,8 +81,8 @@ def get_book(request, id):
         save_log(request, json_response)
         return Response(json_response, status = status.HTTP_417_EXPECTATION_FAILED)
     
-@api_view(['POST'])
-@renderer_classes([JSONRenderer])
+### ------------------------------------------------------------- ###
+
 def add_book(request):
     json_response = {
         'response_id': str(uuid.uuid4().hex)
@@ -110,15 +133,15 @@ def add_book(request):
             save_log(request, json_response)
             return Response(json_response, status = status.HTTP_417_EXPECTATION_FAILED)
 
-@api_view(['PUT'])
-@renderer_classes([JSONRenderer])
-def update_book(request):
+### ------------------------------------------------------------- ###
+
+def update_book(request, id):
     json_response = {
         'response_id': str(uuid.uuid4().hex)
     }
     try:
         book = json.loads(request.body)
-        updated_book = Book.objects.get(id = book['id'])
+        updated_book = Book.objects.get(id = id)
         updated_book.title = book['title'] if 'title' in book else updated_book.title
         updated_book.author = book['author'] if 'author' in book else updated_book.author
         updated_book.genre = book['genre'] if 'genre' in book else updated_book.genre
@@ -142,14 +165,13 @@ def update_book(request):
         save_log(request, json_response)
         return Response(json_response, status = status.HTTP_417_EXPECTATION_FAILED)
 
-@api_view(['DELETE'])
-@renderer_classes([JSONRenderer])
-def delete_book(request):
+### ------------------------------------------------------------- ###
+
+def delete_book(request, id):
     json_response = {
         'response_id': str(uuid.uuid4().hex)
     }
     try:
-        id = json.loads(request.body)['id']
         deleted_book = Book.objects.get(id = id)
         deleted_book.delete()
 
